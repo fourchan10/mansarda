@@ -1,0 +1,338 @@
+{% extends "base.html" %}
+{% block title %}Админ — Панель{% endblock %}
+{% block body %}
+  <div class="topbar">
+    <span class="badge">Мансарда</span>
+    <div class="nav">
+      <a href="{{ url_for('admin_dashboard') }}" class="active">Панель</a>
+      <a href="{{ url_for('admin_menus') }}">Меню</a>
+      <a href="{{ url_for('admin_categories') }}">Категории</a>
+      <a href="{{ url_for('admin_dishes') }}">Блюда</a>
+    </div>
+    <a class="btn right" href="{{ url_for('admin_logout') }}">Выйти</a>
+  </div>
+
+  <div class="container">
+    <div class="admin-shell">
+      <!-- Левая колонка: настройки -->
+      <div class="admin-main">
+        <h1 class="page-title">Админ-панель</h1>
+        <p class="page-subtitle">
+          Здесь можно настроить внешний вид меню, телефон в шапке и посмотреть базовую статистику.
+        </p>
+
+        <!-- Статистика -->
+        <div class="card">
+          <h2>Статистика</h2>
+          <p class="small muted">Быстрый обзор по количеству созданных сущностей.</p>
+          <div class="stats-grid mt">
+            <div class="stat-pill">
+              <span class="stat-label">Меню</span>
+              <span class="stat-value">{{ stats.menus }}</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-label">Категории</span>
+              <span class="stat-value">{{ stats.categories }}</span>
+            </div>
+            <div class="stat-pill">
+              <span class="stat-label">Блюда</span>
+              <span class="stat-value">{{ stats.dishes }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Настройки телефона, цветов и шрифта -->
+        <div class="card mt-lg">
+          <h2>Телефон и оформление меню</h2>
+          <p class="small muted">
+            Эти настройки сразу применяются к публичному меню справа. Можно подобрать цвета и шрифт под бренд заведения.
+          </p>
+
+          <form method="post" class="mt">
+            <!-- Телефон -->
+            <div>
+              <label>Телефон для хедера</label>
+              <p class="small muted" style="margin:4px 0 6px;">
+                Этот номер будет показываться в верхней панели меню вместо текста «Мансарда» при прокрутке.
+              </p>
+              <input
+                name="phone"
+                value="{{ settings.phone or '' }}"
+                placeholder="+7 (777) 123-45-67"
+              >
+            </div>
+
+            <!-- Цвета -->
+            <h3 class="mt" style="margin-bottom:4px; font-size:14px;">Цвета меню</h3>
+            <p class="small muted" style="margin:0 0 10px;">
+              Цвета применяются ко всему публичному меню: фон, карточки, текст и акценты.
+            </p>
+
+            <div class="grid2">
+              <div>
+                <label>Фон страницы (bg)</label>
+                <input
+                  type="color"
+                  name="bg"
+                  value="{{ settings.bg or '#121015' }}"
+                >
+                <small class="muted small">
+                  Текущий: {{ settings.bg or '#121015' }}
+                </small>
+              </div>
+
+              <div>
+                <label>Цвет карточек (card)</label>
+                <input
+                  type="color"
+                  name="card"
+                  value="{{ settings.card or '#181820' }}"
+                >
+                <small class="muted small">
+                  Текущий: {{ settings.card or '#181820' }}
+                </small>
+              </div>
+
+              <div>
+                <label>Цвет вторичного текста (muted)</label>
+                <input
+                  type="color"
+                  name="muted"
+                  value="{{ settings.muted or '#9aa3b2' }}"
+                >
+                <small class="muted small">
+                  Текущий: {{ settings.muted or '#9aa3b2' }}
+                </small>
+              </div>
+
+              <div>
+                <label>Основной цвет текста (text)</label>
+                <input
+                  type="color"
+                  name="text"
+                  value="{{ settings.text or '#f5f7fb' }}"
+                >
+                <small class="muted small">
+                  Текущий: {{ settings.text or '#f5f7fb' }}
+                </small>
+              </div>
+
+              <div>
+                <label>Цвет бренда / цены (brand)</label>
+                <input
+                  type="color"
+                  name="brand"
+                  value="{{ settings.brand or '#ffbd2f' }}"
+                >
+                <small class="muted small">
+                  Текущий: {{ settings.brand or '#ffbd2f' }}
+                </small>
+              </div>
+
+              <div>
+                <label>Дополнительный акцент (accent)</label>
+                <input
+                  type="color"
+                  name="accent"
+                  value="{{ settings.accent or '#4fd1c5' }}"
+                >
+                <small class="muted small">
+                  Текущий: {{ settings.accent or '#4fd1c5' }}
+                </small>
+              </div>
+
+              <div>
+                <label>Цвет бордеров (border)</label>
+                <input
+                  name="border"
+                  value="{{ settings.border or 'rgba(255,255,255,.08)' }}"
+                  placeholder="rgba(255,255,255,.08) или #222222"
+                >
+                <small class="muted small">
+                  Текущий: {{ settings.border or 'rgba(255,255,255,.08)' }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Шрифт бренда -->
+            <h3 class="mt" style="margin-bottom:4px; font-size:14px;">Шрифт бренда / заголовков</h3>
+            <p class="small muted" style="margin:0 0 10px;">
+              Этот шрифт используется для логотипа «Мансарда» и частично для заголовков.
+            </p>
+
+            <select name="brand_font">
+              <option
+                value="system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell"
+                {% if not settings.brand_font or settings.brand_font == 'system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell' %}
+                  selected
+                {% endif %}
+              >
+                Системный (по умолчанию)
+              </option>
+
+              <option
+                value="'Playfair Display','Times New Roman',serif"
+                {% if settings.brand_font == "'Playfair Display','Times New Roman',serif" %}
+                  selected
+                {% endif %}
+              >
+                Playfair / Times (элегантный, с засечками)
+              </option>
+
+              <option
+                value="'Raleway','Segoe UI',sans-serif"
+                {% if settings.brand_font == "'Raleway','Segoe UI',sans-serif" %}
+                  selected
+                {% endif %}
+              >
+                Raleway (легкий, воздушный)
+              </option>
+
+              <option
+                value="'Montserrat','Segoe UI',sans-serif"
+                {% if settings.brand_font == "'Montserrat','Segoe UI',sans-serif" %}
+                  selected
+                {% endif %}
+              >
+                Montserrat (современный, универсальный)
+              </option>
+
+              <option
+                value="'Oswald','Arial Narrow',sans-serif"
+                {% if settings.brand_font == "'Oswald','Arial Narrow',sans-serif" %}
+                  selected
+                {% endif %}
+              >
+                Oswald (узкий, плотный, для заголовков)
+              </option>
+
+              <option
+                value="'PT Serif','Georgia',serif"
+                {% if settings.brand_font == "'PT Serif','Georgia',serif" %}
+                  selected
+                {% endif %}
+              >
+                PT Serif / Georgia (уютный, ресторанный)
+              </option>
+
+              <option
+                value="'Roboto','system-ui',sans-serif"
+                {% if settings.brand_font == "'Roboto','system-ui',sans-serif" %}
+                  selected
+                {% endif %}
+              >
+                Roboto (классический UI-шрифт)
+              </option>
+
+              <option
+                value="'Inter','system-ui',sans-serif"
+                {% if settings.brand_font == "'Inter','system-ui',sans-serif" %}
+                  selected
+                {% endif %}
+              >
+                Inter (современный интерфейсный)
+              </option>
+
+              <option
+                value="'Trebuchet MS',sans-serif"
+                {% if settings.brand_font == "'Trebuchet MS',sans-serif" %}
+                  selected
+                {% endif %}
+              >
+                Trebuchet MS (аккуратный заголовок)
+              </option>
+
+              <option
+                value="'Courier New',monospace"
+                {% if settings.brand_font == "'Courier New',monospace" %}
+                  selected
+                {% endif %}
+              >
+                Courier New (моноширинный)
+              </option>
+
+              <option
+                value="'Arial',sans-serif"
+                {% if settings.brand_font == "'Arial',sans-serif" %}
+                  selected
+                {% endif %}
+              >
+                Arial / Helvetica (классический без засечек)
+              </option>
+
+              <option
+                value="'Verdana','Geneva',sans-serif"
+                {% if settings.brand_font == "'Verdana','Geneva',sans-serif" %}
+                  selected
+                {% endif %}
+              >
+                Verdana (широкий, читабельный)
+              </option>
+
+              <option
+                value="'Tahoma','Geneva',sans-serif"
+                {% if settings.brand_font == "'Tahoma','Geneva',sans-serif" %}
+                  selected
+                {% endif %}
+              >
+                Tahoma (чуть более плотный)
+              </option>
+
+              <option
+                value="'Impact','Haettenschweiler','Arial Narrow Bold',sans-serif"
+                {% if settings.brand_font == "'Impact','Haettenschweiler','Arial Narrow Bold',sans-serif" %}
+                  selected
+                {% endif %}
+              >
+                Impact (жирный, для яркого логотипа)
+              </option>
+
+              <option
+                value="'Lucida Console',monospace"
+                {% if settings.brand_font == "'Lucida Console',monospace" %}
+                  selected
+                {% endif %}
+              >
+                Lucida Console (моноширинный, строгий)
+              </option>
+            </select>
+
+            <small class="muted small">
+              Текущий: {{ settings.brand_font or 'system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell' }}
+            </small>
+
+            <button class="btn btn-primary mt" type="submit">Сохранить настройки</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Правая колонка: живое превью -->
+      <aside class="admin-preview">
+        <div class="card preview-card">
+          <div class="preview-header">
+            <div class="preview-dots">
+              <span class="dot red"></span>
+              <span class="dot yellow"></span>
+              <span class="dot green"></span>
+            </div>
+            <span class="preview-title">Публичное меню — превью</span>
+            <div class="preview-header-spacer"></div>
+            <a
+              class="btn btn-ghost btn-xs"
+              href="{{ url_for('index') }}"
+              target="_blank"
+            >
+              В новом окне
+            </a>
+          </div>
+
+          <iframe
+            src="{{ url_for('index') }}"
+            class="preview-frame"
+            loading="lazy"
+          ></iframe>
+        </div>
+      </aside>
+    </div>
+  </div>
+{% endblock %}

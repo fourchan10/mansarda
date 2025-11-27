@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Админ — Меню{% endblock %}
+{% block body %}
+  <div class="topbar">
+    <span class="badge">Мансарда</span>
+    <div class="nav">
+      <a href="{{ url_for('admin_dashboard') }}">Панель</a>
+      <a href="{{ url_for('admin_menus') }}" class="active">Меню</a>
+      <a href="{{ url_for('admin_categories') }}">Категории</a>
+      <a href="{{ url_for('admin_dishes') }}">Блюда</a>
+    </div>
+    <a class="btn right" href="{{ url_for('admin_logout') }}">Выйти</a>
+  </div>
+
+  <div class="container">
+    <h2>Добавить меню</h2>
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="action" value="create">
+      <div class="grid2">
+        <div>
+          <label>Slug (machine ID, латиница)</label>
+          <input name="slug" placeholder="main / bar / wine" required>
+        </div>
+        <div>
+          <label>Название RU</label>
+          <input name="title_ru" placeholder="Основное меню" required>
+        </div>
+        <div>
+          <label>Атауы KZ</label>
+          <input name="title_kz" placeholder="Негізгі мәзір" required>
+        </div>
+        <div>
+          <label>Name EN</label>
+          <input name="title_en" placeholder="Main menu" required>
+        </div>
+        <div>
+          <label>Картинка меню</label>
+          <input type="file" name="image" accept=".png,.jpg,.jpeg,.webp,.gif">
+        </div>
+      </div>
+      <button class="btn btn-primary">Создать</button>
+    </form>
+
+    <h2 class="mt">Меню</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Картинка</th>
+          <th>Slug</th>
+          <th>RU</th>
+          <th>KZ</th>
+          <th>EN</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in menus %}
+        <tr>
+          <td>{{ m.id }}</td>
+          <td>
+            {% if m.image %}
+              <img src="{{ m.image }}" style="width:64px;height:64px;object-fit:cover;border-radius:8px">
+            {% endif %}
+          </td>
+          <td>{{ m.slug }}</td>
+          <td>{{ m.title_ru }}</td>
+          <td>{{ m.title_kz }}</td>
+          <td>{{ m.title_en }}</td>
+          <td style="white-space:nowrap;">
+            <a class="btn" href="{{ url_for('admin_menu_edit', menu_id=m.id) }}">Редактировать</a>
+            <form method="post" style="display:inline;" onsubmit="return confirm('Удалить меню и все его категории/блюда?');">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="id" value="{{ m.id }}">
+              <button class="btn">Удалить</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Редактировать категорию{% endblock %}
+{% block body %}
+  <div class="topbar">
+    <span class="badge">Мансарда</span>
+    <div class="nav">
+      <a href="{{ url_for('admin_dashboard') }}">Панель</a>
+      <a href="{{ url_for('admin_menus') }}">Меню</a>
+      <a href="{{ url_for('admin_categories') }}" class="active">Категории</a>
+      <a href="{{ url_for('admin_dishes') }}">Блюда</a>
+    </div>
+    <a class="btn right" href="{{ url_for('admin_logout') }}">Выйти</a>
+  </div>
+
+  <div class="container">
+    <h2>Редактировать категорию #{{ cat.id }}</h2>
+
+    <form method="post">
+      <input type="hidden" name="action" value="update">
+      <div class="grid2">
+        <div>
+          <label>Меню</label>
+          <select name="menu_id" required>
+            {% for m in menus %}
+              <option value="{{ m.id }}" {% if m.id == cat.menu_id %}selected{% endif %}>
+                {{ m.title_ru }} ({{ m.slug }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label>Slug категории</label>
+          <input name="slug" value="{{ cat.slug }}" required>
+        </div>
+        <div>
+          <label>Название RU</label>
+          <input name="name_ru" value="{{ cat.name_ru }}" required>
+        </div>
+        <div>
+          <label>Атауы KZ</label>
+          <input name="name_kz" value="{{ cat.name_kz }}" required>
+        </div>
+        <div>
+          <label>Name EN</label>
+          <input name="name_en" value="{{ cat.name_en }}" required>
+        </div>
+      </div>
+      <button class="btn btn-primary">Сохранить</button>
+      <a class="btn" href="{{ url_for('admin_categories') }}">Отмена</a>
+    </form>
+  </div>
+{% endblock %}

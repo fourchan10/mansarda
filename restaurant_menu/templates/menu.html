@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Меню — Мансарда</title>
+  <style>
+    :root{
+      --bg: {{ theme.bg or '#121015' }};
+      --card: {{ theme.card or '#181820' }};
+      --muted: {{ theme.muted or '#9aa3b2' }};
+      --text: {{ theme.text or '#f5f7fb' }};
+      --brand: {{ theme.brand or '#ffbd2f' }};
+      --accent: {{ theme.accent or '#4fd1c5' }};
+      --border: {{ theme.border or 'rgba(255,255,255,.08)' }};
+      --radius:18px;
+      --shadow:0 6px 24px rgba(0,0,0,.35);
+      --header-h:64px;
+      --brand-font: {{ theme.brand_font or 'system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell' }};
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell;
+      color:var(--text);
+      background:linear-gradient(180deg,var(--bg),#14151c 40%,#101018);
+      background-attachment:fixed;
+    }
+    a{color:inherit; text-decoration:none}
+    img{max-width:100%; display:block}
+
+    .header{
+      position:sticky; top:0; z-index:80; height:var(--header-h);
+      display:flex; align-items:center; gap:16px; padding:0 16px;
+      backdrop-filter:saturate(160%) blur(10px);
+      background:linear-gradient(180deg, rgba(14,16,22,.95), rgba(14,16,22,.7));
+      border-bottom:1px solid var(--border);
+    }
+    .logo-wrap{display:flex; align-items:center; gap:10px;}
+    .logo-circle{
+      width:32px; height:32px; border-radius:999px;
+      background:var(--brand); color:#101114; font-weight:900;
+      display:flex; align-items:center; justify-content:center;
+      box-shadow:0 0 0 2px rgba(0,0,0,.4); font-size:18px;
+    }
+    .brand{
+      font-weight:800;
+      letter-spacing:.5px;
+      white-space:nowrap;
+      /* font-family:var(--brand-font); */
+    }
+
+    .lang-switch{
+      margin-left:auto;
+      display:inline-flex; gap:6px; align-items:center;
+      border:1px solid var(--border); background:#1d1e28;
+      padding:8px 12px; border-radius:999px; cursor:pointer;
+      font-size:13px;
+    }
+    .lang-switch span{opacity:.6}
+    .lang-switch .active{opacity:1; font-weight:700}
+
+    .page{
+      max-width:1200px;
+      margin:0 auto;
+      padding:12px 16px 70px;
+    }
+
+    .menu-strip{
+      display:flex; gap:12px; overflow-x:auto;
+      padding:6px 2px 12px;
+      margin-bottom:8px;
+    }
+    .menu-strip::-webkit-scrollbar{height:8px}
+    .menu-strip::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15); border-radius:999px}
+    .menu-card{
+      flex:0 0 auto;
+      width:180px;
+      background:var(--card);
+      border-radius:18px;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      cursor:pointer;
+      display:flex;
+      flex-direction:column;
+    }
+    .menu-card.active{
+      border-color:var(--brand);
+      box-shadow:0 0 0 1px rgba(255,189,47,.8), 0 6px 26px rgba(0,0,0,.5);
+    }
+    .menu-card-img{
+      width:100%; height:90px; overflow:hidden;
+    }
+    .menu-card-img img{
+      width:100%; height:100%; object-fit:cover;
+    }
+    .menu-card-body{
+      padding:8px 10px 10px;
+      font-size:14px;
+      font-weight:600;
+    }
+
+    .search-wrap{
+      margin:6px 0 10px;
+    }
+    .search-input{
+      width:100%; border-radius:999px; border:1px solid var(--border);
+      background:#1b1c27; color:var(--text);
+      padding:9px 14px; font-size:14px;
+      outline:none;
+    }
+
+    .catbar-wrap{
+      position:sticky; top:var(--header-h); z-index:60;
+      background:linear-gradient(180deg, rgba(14,16,22,.96), rgba(14,16,22,.7));
+      backdrop-filter:saturate(160%) blur(10px);
+      border-bottom:1px solid var(--border)
+    }
+    .catbar{
+      display:flex; gap:10px; overflow-x:auto;
+      overscroll-behavior-inline:contain; padding:10px 2px;
+    }
+    .catbar::-webkit-scrollbar{height:8px}
+    .catbar::-webkit-scrollbar-thumb{
+      background:rgba(255,255,255,.15); border-radius:999px
+    }
+    .cat{
+      flex:0 0 auto;
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 14px; border-radius:999px;
+      border:1px solid var(--border); background:#1b1c27;
+      color:var(--muted); white-space:nowrap; font-size:14px;
+    }
+    .cat:hover{color:var(--text)}
+    .cat.active{
+      background:rgba(255,189,47,.18);
+      color:var(--brand); font-weight:700
+    }
+
+    .category{scroll-margin-top:calc(var(--header-h) + 54px)}
+    .category h2{margin:18px 4px 12px; letter-spacing:.3px}
+
+    .grid{display:grid; gap:14px; grid-template-columns:repeat(auto-fill, minmax(260px,1fr))}
+    @media (max-width:560px){ .grid{grid-template-columns:1fr} }
+
+    .card{
+      display:grid; grid-template-columns:120px 1fr; gap:12px;
+      background:var(--card); border:1px solid var(--border);
+      border-radius:var(--radius); box-shadow:var(--shadow);
+      padding:10px; min-height:120px; cursor:pointer;
+    }
+    @media (max-width:560px){ .card{grid-template-columns:100px 1fr} }
+    .thumb{border-radius:14px; overflow:hidden; background:#0a0b0f; aspect-ratio:1/1}
+    .card-body{display:flex; flex-direction:column; gap:6px}
+    .title{font-weight:700; font-size:15px;}
+    .meta{display:flex; align-items:center; gap:10px; margin-top:auto}
+    .price{font-weight:800; color:var(--brand); font-size:15px;}
+
+    .hint{color:var(--muted); text-align:center; margin:22px 0 60px; font-size:13px;}
+
+    .sheet{
+      position:fixed; left:0; right:0; bottom:0;
+      translate:0 100%; transition:translate .25s ease; z-index:100
+    }
+    .sheet.open{translate:0 0}
+    .sheet-inner{
+      background:#161621;
+      border-top-left-radius:22px; border-top-right-radius:22px;
+      border:1px solid var(--border);
+      box-shadow:0 -12px 40px rgba(0,0,0,.6);
+      max-height:85vh; height:85vh; overflow:auto
+    }
+    @media (min-width:900px){
+      .sheet-inner{
+        max-width:820px; margin:0 auto;
+        height:70vh; max-height:70vh
+      }
+    }
+    .sheet-handle{display:flex; justify-content:center; padding:10px 0 0}
+    .handle{
+      width:44px; height:5px; background:rgba(255,255,255,.25);
+      border-radius:999px
+    }
+    .sheet-content{padding:14px 16px 8px}
+    .sheet-header{display:flex; align-items:center; gap:14px}
+    .sheet-img{
+      width:120px; height:120px; border-radius:16px;
+      overflow:hidden; flex:0 0 auto
+    }
+    .sheet-title{font-size:20px; font-weight:800}
+    .sheet-price{margin-left:auto; color:var(--brand); font-weight:800}
+    .section-title{font-weight:800; margin:14px 0 6px; font-size:14px;}
+    .section-text{color:var(--muted); font-size:14px;}
+    .sheet-close{
+      position:sticky; bottom:0;
+      display:flex; justify-content:center;
+      padding:12px 16px 16px;
+      background:linear-gradient(180deg, rgba(18,19,24,0), rgba(18,19,24,.97) 35%);
+    }
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:12px 16px; border-radius:14px;
+      border:1px solid var(--border); background:#1b1c27;
+      color:var(--text); cursor:pointer; font-size:14px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="logo-wrap">
+      <img src="{{ url_for('static', filename='img/emblem.png') }}" alt="" width="40">
+      <div
+        class="brand"
+        id="brandTitle"
+        style="font-family: {{ theme.brand_font or 'system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell' }};"
+      >
+        Mansarda
+      </div>
+    </div>
+    <button class="lang-switch" id="langBtn" type="button" aria-label="Switch language">
+      <span id="langRU" class="active">RU</span> |
+      <span id="langKK">KK</span> |
+      <span id="langEN">EN</span>
+    </button>
+  </header>
+
+  <main class="page">
+    <div class="menu-strip" id="menuStrip"></div>
+
+    <div class="search-wrap">
+      <input id="searchInput" class="search-input" placeholder="Поиск по блюдам..." />
+    </div>
+  </main>
+
+  <div class="catbar-wrap">
+    <div class="page" style="padding-bottom:8px;">
+      <nav class="catbar" id="catbar"></nav>
+    </div>
+  </div>
+
+  <main class="page">
+    <div id="content"></div>
+  </main>
+
+  <div class="sheet" id="sheet" aria-hidden="true">
+    <div class="sheet-inner" id="sheetInner">
+      <div class="sheet-handle"><div class="handle"></div></div>
+      <div class="sheet-content" id="sheetContent"></div>
+      <div class="sheet-close"><button class="btn" id="closeBtn">Закрыть</button></div>
+    </div>
+  </div>
+
+  <script>
+    const PHONE = "{{ phone }}".trim();
+    const MANSARDA_NAME = "Mansarda";
+
+    const STR = {
+      ru: {
+        ingredients: "Ингредиенты:",
+        close: "Закрыть",
+        searchPlaceholder: "Поиск по блюдам..."
+      },
+      kk: {
+        ingredients: "Құрамы:",
+        close: "Жабу",
+        searchPlaceholder: "Тағамдар бойынша іздеу..."
+      },
+      en: {
+        ingredients: "Ingredients:",
+        close: "Close",
+        searchPlaceholder: "Search dishes..."
+      }
+    };
+
+    const getLang = () => localStorage.getItem("lang") || "ru";
+    const setLang = (l) => localStorage.setItem("lang", l);
+
+    const DATA = {
+      menus: [
+        {% for m in menus %}
+        {
+          id: {{ m.id }},
+          slug: "{{ m.slug }}",
+          title: { ru: "{{ m.title_ru }}", kk: "{{ m.title_kz }}", en: "{{ m.title_en }}" },
+          image: "{{ m.image }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ],
+      categories: [
+        {% for c in categories %}
+        {
+          id: {{ c.id }},
+          menu_id: {{ c.menu_id }},
+          slug: "{{ c.slug }}",
+          name: { ru: "{{ c.name_ru }}", kk: "{{ c.name_kz }}", en: "{{ c.name_en }}" }
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ],
+      items: [
+        {% for i in items %}
+        {
+          id: {{ i.id }},
+          category_id: {{ i.category_id }},
+          slug: "{{ i.slug }}",
+          title: { ru: "{{ i.title_ru }}", kk: "{{ i.title_kz }}", en: "{{ i.title_en }}" },
+          price: {{ i.price }},
+          ing: { ru: "{{ i.ing_ru }}", kk: "{{ i.ing_kz }}", en: "{{ i.ing_en }}" },
+          image: "{{ i.image }}"
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+      ]
+    };
+
+    const menuStrip = document.getElementById("menuStrip");
+    const catbar = document.getElementById("catbar");
+    const content = document.getElementById("content");
+    const brandTitle = document.getElementById("brandTitle");
+    const searchInput = document.getElementById("searchInput");
+    const sheet = document.getElementById("sheet");
+    const sheetInner = document.getElementById("sheetInner");
+    const sheetContent = document.getElementById("sheetContent");
+    const closeBtn = document.getElementById("closeBtn");
+    const langBtn = document.getElementById("langBtn");
+    const langRU = document.getElementById("langRU");
+    const langKK = document.getElementById("langKK");
+    const langEN = document.getElementById("langEN");
+
+    const rub = (n) => new Intl.NumberFormat("ru-RU").format(n) + " ₸";
+    const tf = (obj, l) => (obj && typeof obj === "object" && obj[l]) ? obj[l] : "";
+
+    let currentMenuId = DATA.menus.length ? DATA.menus[0].id : null;
+    let searchTerm = "";
+
+    function renderMenuStrip(lang) {
+      menuStrip.innerHTML = DATA.menus.map(m => `
+        <div class="menu-card ${m.id === currentMenuId ? "active" : ""}" data-menu-id="${m.id}">
+          <div class="menu-card-img">
+            ${m.image ? `<img src="${m.image}" alt="${tf(m.title, lang)}">` : ""}
+          </div>
+          <div class="menu-card-body">
+            ${tf(m.title, lang)}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderCatbar(lang) {
+      const cats = DATA.categories.filter(c => c.menu_id === currentMenuId);
+      catbar.innerHTML = cats.map((c, idx) => `
+        <a class="cat ${idx === 0 ? "active" : ""}" href="#cat-${c.id}" data-cat-id="${c.id}">
+          ${tf(c.name, lang)}
+        </a>
+      `).join("");
+    }
+
+    function renderContent(lang) {
+      const cats = DATA.categories.filter(c => c.menu_id === currentMenuId);
+
+      const term = searchTerm.trim().toLowerCase();
+      content.innerHTML = cats.map(c => {
+        const items = DATA.items.filter(i => i.category_id === c.id).filter(i => {
+          if (!term) return true;
+          const title = tf(i.title, lang).toLowerCase();
+          const ing = (i.ing && i.ing[lang] ? i.ing[lang] : "").toLowerCase();
+          return title.includes(term) || ing.includes(term);
+        });
+        if (!items.length) return "";
+        return `
+          <section class="category" id="cat-${c.id}">
+            <h2>${tf(c.name, lang)}</h2>
+            <div class="grid">
+              ${items.map(item => `
+                <article class="card" data-item-id="${item.id}">
+                  <div class="thumb">
+                    ${item.image ? `<img src="${item.image}" alt="${tf(item.title, lang)}">` : ""}
+                  </div>
+                  <div class="card-body">
+                    <div class="title">${tf(item.title, lang)}</div>
+                    <div class="meta">
+                      <span class="price">${rub(item.price)}</span>
+                    </div>
+                  </div>
+                </article>
+              `).join("")}
+            </div>
+          </section>
+        `;
+      }).join("");
+    }
+
+    function updateLangStatic(lang) {
+      searchInput.placeholder = STR[lang].searchPlaceholder;
+      closeBtn.textContent = STR[lang].close;
+      langRU.classList.toggle("active", lang === "ru");
+      langKK.classList.toggle("active", lang === "kk");
+      langEN.classList.toggle("active", lang === "en");
+      document.documentElement.lang = lang;
+    }
+
+    function rerenderAll() {
+      const lang = getLang();
+      updateLangStatic(lang);
+      renderMenuStrip(lang);
+      renderCatbar(lang);
+      renderContent(lang);
+    }
+
+    menuStrip.addEventListener("click", (e) => {
+      const card = e.target.closest(".menu-card");
+      if (!card) return;
+      currentMenuId = Number(card.dataset.menuId);
+      rerenderAll();
+    });
+
+    searchInput.addEventListener("input", () => {
+      searchTerm = searchInput.value;
+      renderContent(getLang());
+    });
+
+    content.addEventListener("click", (e) => {
+      const card = e.target.closest(".card");
+      if (!card) return;
+      const id = Number(card.dataset.itemId);
+      const item = DATA.items.find(x => x.id === id);
+      if (!item) return;
+      openSheet(item, getLang());
+    });
+
+    function openSheet(item, lang) {
+      let ingText = "";
+      if (item.ing && typeof item.ing === "object") {
+        const val = item.ing[lang];
+        if (Array.isArray(val)) ingText = val.join(", ");
+        else if (typeof val === "string") ingText = val;
+      } else if (typeof item.ing === "string") {
+        ingText = item.ing;
+      }
+
+      sheetContent.innerHTML = `
+        <div class="sheet-header">
+          <div class="sheet-img">
+            ${item.image ? `<img src="${item.image}" alt="${tf(item.title, lang)}">` : ""}
+          </div>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <div class="sheet-title">${tf(item.title, lang)}</div>
+          </div>
+          <div class="sheet-price">${rub(item.price)}</div>
+        </div>
+        <div class="section">
+          <div class="section-title">${STR[lang].ingredients}</div>
+          <div class="section-text">${ingText || "—"}</div>
+        </div>
+      `;
+      closeBtn.textContent = STR[lang].close;
+      sheet.classList.add("open");
+      sheet.setAttribute("aria-hidden", "false");
+    }
+
+    function closeSheet() {
+      sheet.classList.remove("open");
+      sheet.setAttribute("aria-hidden", "true");
+      resetDrag();
+    }
+
+    closeBtn.addEventListener("click", closeSheet);
+
+    let startY = 0, currentY = 0, dragging = false;
+    const threshold = 90;
+
+    function onStart(y){ dragging = true; startY = y; sheetInner.style.transition = "none"; }
+    function onMove(y){ if(!dragging) return; currentY = Math.max(0, y - startY); sheetInner.style.transform = `translateY(${currentY}px)`; }
+    function onEnd(){ if(!dragging) return; sheetInner.style.transition = ""; if(currentY > threshold){ closeSheet(); } else { sheetInner.style.transform = "translateY(0)"; } dragging = false; }
+    function resetDrag(){ sheetInner.style.transition = ""; sheetInner.style.transform = "translateY(0)"; startY=0; currentY=0; dragging=false; }
+
+    sheetInner.addEventListener("touchstart", e=>onStart(e.touches[0].clientY), {passive:true});
+    sheetInner.addEventListener("touchmove",  e=>onMove(e.touches[0].clientY),  {passive:true});
+    sheetInner.addEventListener("touchend",   onEnd);
+
+    sheetInner.addEventListener("mousedown", e=>onStart(e.clientY));
+    window.addEventListener("mousemove", e=>onMove(e.clientY));
+    window.addEventListener("mouseup", onEnd);
+
+    langBtn.addEventListener("click", () => {
+      const cur = getLang();
+      const next = cur === "ru" ? "kk" : (cur === "kk" ? "en" : "ru");
+      setLang(next);
+      rerenderAll();
+      if (sheet.classList.contains("open")) {
+        closeBtn.textContent = STR[next].close;
+      }
+    });
+
+    if (!localStorage.getItem("lang")) setLang("ru");
+    rerenderAll();
+
+    function updateBrandOnScroll(){
+      const y = window.scrollY || document.documentElement.scrollTop;
+      if (y > 80 && PHONE) brandTitle.textContent = PHONE;
+      else brandTitle.textContent = MANSARDA_NAME;
+    }
+    window.addEventListener("scroll", updateBrandOnScroll);
+    updateBrandOnScroll();
+  </script>
+</body>
+</html>

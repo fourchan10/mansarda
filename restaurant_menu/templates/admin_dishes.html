@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Админ — Блюда{% endblock %}
+{% block body %}
+  <div class="topbar">
+    <span class="badge">Мансарда</span>
+    <div class="nav">
+      <a href="{{ url_for('admin_dashboard') }}">Панель</a>
+      <a href="{{ url_for('admin_menus') }}">Меню</a>
+      <a href="{{ url_for('admin_categories') }}">Категории</a>
+      <a href="{{ url_for('admin_dishes') }}" class="active">Блюда</a>
+    </div>
+    <a class="btn right" href="{{ url_for('admin_logout') }}">Выйти</a>
+  </div>
+
+  <div class="container">
+    <h2>Добавить блюдо</h2>
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="action" value="create">
+      <div class="grid2">
+        <div>
+          <label>Категория</label>
+          <select name="category_id" required>
+            <option value="" disabled selected>Выберите категорию</option>
+            {% for c in cats %}
+              <option value="{{ c.id }}">
+                {{ c.menu_obj.title_ru }} → {{ c.name_ru }} ({{ c.slug }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label>Slug блюда (machine ID)</label>
+          <input name="slug" placeholder="turkish-breakfast" required>
+        </div>
+        <div>
+          <label>Название RU</label>
+          <input name="title_ru" placeholder="Турецкий завтрак" required>
+        </div>
+        <div>
+          <label>Атауы KZ</label>
+          <input name="title_kz" placeholder="Түрік таңғы асы" required>
+        </div>
+        <div>
+          <label>Name EN</label>
+          <input name="title_en" placeholder="Turkish breakfast" required>
+        </div>
+        <div>
+          <label>Цена (₸)</label>
+          <input name="price" placeholder="7990" value="0">
+        </div>
+        <div>
+          <label>Фото</label>
+          <input type="file" name="image" accept=".png,.jpg,.jpeg,.webp,.gif">
+        </div>
+      </div>
+
+      <label>Ингредиенты RU (через запятую)</label>
+      <input name="ing_ru" placeholder="сыр, оливки, овощи, яйца, лепёшка">
+
+      <label>Ингредиенттер KZ (үтір арқылы)</label>
+      <input name="ing_kz" placeholder="ірімшік, зәйтүн, көкөністер, жұмыртқа, нан">
+
+      <label>Ingredients EN (comma separated)</label>
+      <input name="ing_en" placeholder="cheese, olives, veggies, eggs, flatbread">
+
+      <button class="btn btn-primary">Добавить</button>
+    </form>
+
+    <h2 class="mt">Блюда</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Фото</th>
+          <th>Slug</th>
+          <th>RU</th>
+          <th>KZ</th>
+          <th>EN</th>
+          <th>Категория (меню)</th>
+          <th>Цена</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in dishes %}
+        <tr>
+          <td>{{ d.id }}</td>
+          <td>
+            {% if d.image %}
+              <img src="{{ d.image }}" style="width:64px;height:64px;object-fit:cover;border-radius:8px">
+            {% endif %}
+          </td>
+          <td>{{ d.slug }}</td>
+          <td>{{ d.title_ru }}</td>
+          <td>{{ d.title_kz }}</td>
+          <td>{{ d.title_en }}</td>
+          <td>
+            {{ d.category_obj.menu_obj.title_ru }} → {{ d.category_obj.name_ru }}
+          </td>
+          <td>{{ d.price }} ₸</td>
+          <td style="white-space:nowrap;">
+            <a class="btn" href="{{ url_for('admin_dish_edit', dish_id=d.id) }}">Редактировать</a>
+            <form method="post" style="display:inline;" onsubmit="return confirm('Удалить блюдо?');">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="id" value="{{ d.id }}">
+              <button class="btn">Удалить</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

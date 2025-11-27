@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block title %}Админ — Категории{% endblock %}
+{% block body %}
+  <div class="topbar">
+    <span class="badge">Мансарда</span>
+    <div class="nav">
+      <a href="{{ url_for('admin_dashboard') }}">Панель</a>
+      <a href="{{ url_for('admin_menus') }}">Меню</a>
+      <a href="{{ url_for('admin_categories') }}" class="active">Категории</a>
+      <a href="{{ url_for('admin_dishes') }}">Блюда</a>
+    </div>
+    <a class="btn right" href="{{ url_for('admin_logout') }}">Выйти</a>
+  </div>
+
+  <div class="container">
+    <h2>Добавить категорию</h2>
+    <form method="post">
+      <input type="hidden" name="action" value="create">
+      <div class="grid2">
+        <div>
+          <label>Меню</label>
+          <select name="menu_id" required>
+            <option value="" disabled selected>Выберите меню</option>
+            {% for m in menus %}
+              <option value="{{ m.id }}">{{ m.title_ru }} ({{ m.slug }})</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label>Slug категории (machine ID)</label>
+          <input name="slug" placeholder="breakfast / salads" required>
+        </div>
+        <div>
+          <label>Название RU</label>
+          <input name="name_ru" placeholder="Завтраки" required>
+        </div>
+        <div>
+          <label>Атауы KZ</label>
+          <input name="name_kz" placeholder="Таңғы ас" required>
+        </div>
+        <div>
+          <label>Name EN</label>
+          <input name="name_en" placeholder="Breakfasts" required>
+        </div>
+      </div>
+      <button class="btn btn-primary">Создать</button>
+    </form>
+
+    <h2 class="mt">Категории</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Меню</th>
+          <th>Slug</th>
+          <th>RU</th>
+          <th>KZ</th>
+          <th>EN</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in cats %}
+        <tr>
+          <td>{{ c.id }}</td>
+          <td>{{ c.menu_obj.title_ru }} ({{ c.menu_obj.slug }})</td>
+          <td>{{ c.slug }}</td>
+          <td>{{ c.name_ru }}</td>
+          <td>{{ c.name_kz }}</td>
+          <td>{{ c.name_en }}</td>
+          <td style="white-space:nowrap;">
+            <a class="btn" href="{{ url_for('admin_category_edit', cat_id=c.id) }}">Редактировать</a>
+            <form method="post" style="display:inline;" onsubmit="return confirm('Удалить категорию и её блюда?');">
+              <input type="hidden" name="action" value="delete">
+              <input type="hidden" name="id" value="{{ c.id }}">
+              <button class="btn">Удалить</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

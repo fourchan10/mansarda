@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Редактировать блюдо{% endblock %}
+{% block body %}
+  <div class="topbar">
+    <span class="badge">Мансарда</span>
+    <div class="nav">
+      <a href="{{ url_for('admin_dashboard') }}">Панель</a>
+      <a href="{{ url_for('admin_menus') }}">Меню</a>
+      <a href="{{ url_for('admin_categories') }}">Категории</a>
+      <a href="{{ url_for('admin_dishes') }}" class="active">Блюда</a>
+    </div>
+    <a class="btn right" href="{{ url_for('admin_logout') }}">Выйти</a>
+  </div>
+
+  <div class="container">
+    <h2>Редактировать блюдо #{{ dish.id }}</h2>
+
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="action" value="update">
+      <div class="grid2">
+        <div>
+          <label>Категория</label>
+          <select name="category_id" required>
+            {% for c in cats %}
+              <option value="{{ c.id }}" {% if c.id == dish.category_id %}selected{% endif %}>
+                {{ c.menu_obj.title_ru }} → {{ c.name_ru }} ({{ c.slug }})
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label>Slug блюда</label>
+          <input name="slug" value="{{ dish.slug }}" required>
+        </div>
+        <div>
+          <label>Название RU</label>
+          <input name="title_ru" value="{{ dish.title_ru }}" required>
+        </div>
+        <div>
+          <label>Атауы KZ</label>
+          <input name="title_kz" value="{{ dish.title_kz }}" required>
+        </div>
+        <div>
+          <label>Name EN</label>
+          <input name="title_en" value="{{ dish.title_en }}" required>
+        </div>
+        <div>
+          <label>Цена (₸)</label>
+          <input name="price" value="{{ dish.price }}">
+        </div>
+        <div>
+          <label>Текущее фото</label><br>
+          {% if dish.image %}
+            <img src="{{ dish.image }}" style="width:96px;height:96px;object-fit:cover;border-radius:8px">
+          {% else %}
+            <span class="muted">нет</span>
+          {% endif %}
+        </div>
+        <div>
+          <label>Новое фото (если нужно заменить)</label>
+          <input type="file" name="image" accept=".png,.jpg,.jpeg,.webp,.gif">
+        </div>
+      </div>
+
+      <label>Ингредиенты RU</label>
+      <input name="ing_ru" value="{{ dish.ing_ru or '' }}">
+
+      <label>Ингредиенттер KZ</label>
+      <input name="ing_kz" value="{{ dish.ing_kz or '' }}">
+
+      <label>Ingredients EN</label>
+      <input name="ing_en" value="{{ dish.ing_en or '' }}">
+
+      <button class="btn btn-primary">Сохранить</button>
+      <a class="btn" href="{{ url_for('admin_dishes') }}">Отмена</a>
+    </form>
+  </div>
+{% endblock %}

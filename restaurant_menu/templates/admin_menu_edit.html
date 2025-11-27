@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}Редактировать меню{% endblock %}
+{% block body %}
+  <div class="topbar">
+    <span class="badge">Мансарда</span>
+    <div class="nav">
+      <a href="{{ url_for('admin_dashboard') }}">Панель</a>
+      <a href="{{ url_for('admin_menus') }}" class="active">Меню</a>
+      <a href="{{ url_for('admin_categories') }}">Категории</a>
+      <a href="{{ url_for('admin_dishes') }}">Блюда</a>
+    </div>
+    <a class="btn right" href="{{ url_for('admin_logout') }}">Выйти</a>
+  </div>
+
+  <div class="container">
+    <h2>Редактировать меню #{{ menu.id }}</h2>
+
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="action" value="update">
+      <div class="grid2">
+        <div>
+          <label>Slug</label>
+          <input name="slug" value="{{ menu.slug }}" required>
+        </div>
+        <div>
+          <label>Название RU</label>
+          <input name="title_ru" value="{{ menu.title_ru }}" required>
+        </div>
+        <div>
+          <label>Атауы KZ</label>
+          <input name="title_kz" value="{{ menu.title_kz }}" required>
+        </div>
+        <div>
+          <label>Name EN</label>
+          <input name="title_en" value="{{ menu.title_en }}" required>
+        </div>
+        <div>
+          <label>Текущее изображение</label><br>
+          {% if menu.image %}
+            <img src="{{ menu.image }}" style="width:96px;height:96px;object-fit:cover;border-radius:8px">
+          {% else %}
+            <span class="muted">нет</span>
+          {% endif %}
+        </div>
+        <div>
+          <label>Новое изображение (если нужно заменить)</label>
+          <input type="file" name="image" accept=".png,.jpg,.jpeg,.webp,.gif">
+        </div>
+      </div>
+      <button class="btn btn-primary">Сохранить</button>
+      <a class="btn" href="{{ url_for('admin_menus') }}">Отмена</a>
+    </form>
+  </div>
+{% endblock %}
